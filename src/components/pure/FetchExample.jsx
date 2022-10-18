@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { getAllUsers, getAllPagedUsers, getUserDetails } from '../../services/fetchService';
+import { getAllUsers, getAllPagedUsers, getUserDetails, login } from '../../services/fetchService';
 
 const FetchExample = () => {
 
@@ -66,6 +66,20 @@ const FetchExample = () => {
     });
   }
 
+  const authUser = () => {
+    login("eve.holt@reqres.in","cityslicka")
+      .then((response) => {
+        console.log('TOKEN: ', response.token);
+        sessionStorage.setItem('token',response.token)
+      })
+      .catch((error) => {
+        alert(`Error al ingresar: ${error}`)
+      })
+      .finally(() => {
+        console.log('Ingreso exitoso:');
+      });
+  }
+
   return (
     <div>
       <h2>
@@ -79,6 +93,7 @@ const FetchExample = () => {
       <p>Mostrando {usersPerPage} usuarios de {totalUsers}</p>
       <button onClick={() => obtainPagedUsers(1)}>1</button>
       <button onClick={() => obtainPagedUsers(2)}>2</button>
+      <button onClick={() => authUser()}>Simular inicio sesion</button>
       <div>
         { selectedUser && (
         <div>

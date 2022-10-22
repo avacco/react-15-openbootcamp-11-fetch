@@ -1,5 +1,5 @@
 import React from 'react';
-import { login } from '../../services/axios-crud-service';
+import { createUser, deleteUserByID, getAllPagedUsers, getAllUsers, getUserById, login, updateUserById } from '../../services/axios-crud-service';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
@@ -13,6 +13,11 @@ const loginSchema = Yup.object().shape(
 
 const AxiosCRUDExample = () => {
   
+  const initialCredentials = {
+    email: '',
+    password: ''
+  }
+
   const authUser = (values) => {
     login(values.email,values.password)
       .then((response) => {
@@ -28,10 +33,80 @@ const AxiosCRUDExample = () => {
       .finally(() => console.log('Finalizado'));
   }
 
-  const initialCredentials = {
-    email: '',
-    password: ''
+  // Ejemplos CRUD
+  const obtainAllUsers = () => {
+    getAllUsers()
+    .then((response) => {
+      if(response.data && response.status === 200){
+       alert(JSON.stringify(response.data.data));
+      }else{
+        throw new Error('No se han encontrado usuarios');
+      }
+    })
+    .catch((error) => alert(`Algo se rompió: ${error}`))
   }
+
+  const obtainAllPagedUsers = (page) => {
+    getAllPagedUsers(page)
+    .then((response) => {
+      if(response.data && response.status === 200){
+        alert(JSON.stringify(response.data.data));
+      }else{
+        throw new Error(`No se encontraron usuarios en la página ${page}`)
+      }
+    })
+    .catch((error) => alert(`Algo se rompió: ${error}`))
+  }
+
+  const obtainUserByID = (id) => {
+    getUserById(id)
+    .then((response) => {
+      if(response.data && response.status === 200){
+        alert(JSON.stringify(response.data.data));
+      }else{
+        throw new Error('No se han encontrado el usuario');
+      }
+    })
+    .catch((error) => alert(`Algo se rompió: ${error}`))
+  }
+
+  const createNewUser = (name, job) => {
+    createUser(name,job)
+    .then((response) => {
+      if(response.status === 201){
+        alert(JSON.stringify(response.data));
+      }else{
+        throw new Error('No se pudo crear el usuario');
+      }
+    })
+    .catch((error) => alert(`Algo se rompió: ${error}`))
+  }
+
+  const updateUser = (id, name, job) => {
+    updateUserById(id,name,job)
+    .then((response) => {
+      if(response.data && response.status === 200){
+        alert(JSON.stringify(response.data));
+      }else{
+        throw new Error('No se ha actualizado el usuario');
+      }
+    })
+    .catch((error) => alert(`Algo se rompió: ${error}`))
+  }
+
+  const deleteUser = (id) => {
+    deleteUserByID(id)
+    .then((response) => {
+      if(response.status === 204){
+        alert(`Usuario con id ${id} borrado`);
+      }else{
+        throw new Error('No se ha borrado el usuario');
+      }
+    })
+    .catch((error) => alert(`Algo se rompió: ${error}`))
+  }
+
+
   
   return (
 <div>
@@ -88,7 +163,18 @@ const AxiosCRUDExample = () => {
         
 
       </Formik>
+      <br/><br/>
+      {/* Botones para prueba de respuestas de API */}
+      <div>
+            <button onClick={obtainAllUsers}>Obtener todos los usuarios con axios</button><br/>
+            <button onClick={() => obtainAllPagedUsers(2)}>Obtener todos los usuarios paginados (página 2) con axios</button><br/>
+            <button onClick={() => obtainUserByID(3)}>Obtener usuario por id (3) con axios</button><br/>
+            <button onClick={() => createNewUser('morpheus', 'leader')}>Crear usuario con datos predeterminados</button><br/>
+            <button onClick={() => updateUser(1,'morpheus', 'Developer')}>Actualiza usuario con datos predeterminados</button><br/>
+            <button onClick={() => deleteUser(1)}>Borrar usuario por ID</button><br/>
+      </div>
     </div>
+    
   );
 }
 
